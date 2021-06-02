@@ -51,7 +51,7 @@ int main(int argc, const char *argv[])
     fseek(file_pointer, 0, SEEK_SET);
     fread(whole_file, 1, size, file_pointer);
     fclose(file_pointer);
-    flipdiagbmp24(bitmap, width);
+    flipdiagbmp1(bitmap, width);
     file_pointer = fopen(argv[1], "wb");
     if (file_pointer == NULL)
     {
