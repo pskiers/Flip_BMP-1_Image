@@ -1,0 +1,3 @@
+/home/pawel/ARKO/x86/build/CMakeFiles/rebuild_cache.dir
+/home/pawel/ARKO/x86/build/CMakeFiles/edit_cache.dir
+/home/pawel/ARKO/x86/build/CMakeFiles/main.dir
