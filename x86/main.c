@@ -52,6 +52,7 @@ int main(int argc, const char *argv[])
     fread(whole_file, 1, size, file_pointer);
     fclose(file_pointer);
     flipdiagbmp1(bitmap, width);
+    printf("Image has been filpped\n");
     file_pointer = fopen(argv[1], "wb");
     if (file_pointer == NULL)
     {
