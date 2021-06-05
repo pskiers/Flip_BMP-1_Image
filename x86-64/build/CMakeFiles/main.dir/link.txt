@@ -1,0 +1,1 @@
+gcc    CMakeFiles/main.dir/main.c.o CMakeFiles/main.dir/flipdiagbmp1.asm.o  -o main 
