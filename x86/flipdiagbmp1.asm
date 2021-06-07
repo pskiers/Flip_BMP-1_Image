@@ -53,19 +53,17 @@ inc_col_loop:
         mov     bl, al                  ;temp = bit2
         and     bl, [edi]               ;get Pix1 pix-value
 
-        test    bh, bh                  ;swaping pixels...
-        jz      pix1_zero
         or      [edi], al
-        jmp     pix2
-pix1_zero:
+        test    bh, bh                  ;swaping pixels...
+        jnz     pix2
+
         mov     bh, al
         not     bh
         and     [edi], bh
 pix2:
-        test    bl, bl
-        jz      pix2_zero
         or      [esi], ah
-        jmp     restore
+        test    bl, bl
+        jnz     restore
 pix2_zero:
         mov     bl, ah
         not     bl
@@ -109,19 +107,17 @@ dec_col_loop:
         mov     bl, al                  ;temp = bit2
         and     bl, [edi]               ;get Pix1 pix-value
 
-        test    bh, bh                  ;swaping pixels...
-        jz      pix1_zero2
         or      [edi], al
-        jmp     pix22
-pix1_zero2:
+        test    bh, bh                  ;swaping pixels...
+        jnz     pix22
+
         mov     bh, al
         not     bh
         and     [edi], bh
 pix22:
-        test    bl, bl
-        jz      pix2_zero2
         or      [esi], ah
-        jmp     restore2
+        test    bl, bl
+        jnz     restore2
 pix2_zero2:
         mov     bl, ah
         not     bl
