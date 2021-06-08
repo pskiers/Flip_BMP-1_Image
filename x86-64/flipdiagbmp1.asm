@@ -3,149 +3,134 @@
         global  flipdiagbmp1
 
 flipdiagbmp1:
+        push rbx
         push r12
         push r13
+        ;end of prologue
 
-        mov     r11, rsi
-        add     r11, 7
-        shr     r11, 3
-        add     r11, 3
-        and     r11, -4
-        ;row lenght with padding in r11
+        mov     r13, rsi
+        add     r13, 31
+        shr     r13, 3
+        and     r13, -4
+        ;row lenght with padding in r13
 
-        mov     r10, rdi
-        add     r10, r11
-        ;address of pixel to swap from upper left part in r10
+        mov     r12, rdi
+        add     r12, r13
+        ;address of pixel to swap from upper left part in r12
+        ;address of pixel to swap from lower right part in rdi
 
-        mov     r9, rdi
-        ;address of pixel to swap from lower right part in r9
+        mov     al, 0x40              ;bit mask for Pix2 in al
+        mov     r8b, 0x80               ;bit mask for Pix1 in al
 
-        mov     r13b, 0x80        ;bit mask for Pix1
-        mov     al, 0x80        ;bit mask for Pix2
-        ror     al, 1
-
-        mov     r8d, 1
+        mov     r10, 1
         ;processed row number, i=1
 
 two_row_loop:
-        cmp     r8d, esi
-        jae     end_row_loop
-        ;if (processed rows > rows) break
-
-        xor     ecx, ecx
+        xor     r11, r11
         ;prepare iteration counter, j=0
 
 inc_col_loop:
-        cmp     ecx, r8d
+        cmp     r11, r10
         jae     end_inc_col_loop        ;break
         ;if all pixels in this row were swaped, break
+        mov     r9b, r8b                  ;temp = bit1
 
-        mov     r12b, r13b              ;temp = bit1
-        and     r12b, [r10]             ;get Pix1 pix-value
+        mov     bl, al                  ;temp = bit2
+        and     bl, [rdi]               ;get Pix1 pix-value
 
-        mov     dl, al                  ;temp = bit2
-        and     dl, [r9]                ;get Pix1 pix-value
+        or      [rdi], al
+        and     r9b, [r12]               ;get Pix1 pix-value
+        jnz     pix2
 
-        test    r12b, r12b              ;swaping pixels...
-        jz      pix1_zero
-        or      [r9], al
-        jmp     pix2
-pix1_zero:
-        mov     r12b, al
-        not     r12b
-        and     [r9], r12b
+        mov     r9b, al
+        not     r9b
+        and     [rdi], r9b
 pix2:
-        test    dl, dl
-        jz      pix2_zero
-        or      [r10], r13b
-        jmp     restore
+        or      [r12], r8b
+        test    bl, bl
+        jnz     restore
 pix2_zero:
-        mov     dl, r13b
-        not     dl
-        and     [r10], dl               ;...swaping pixels
+        mov     bl, r8b
+        not     bl
+        and     [r12], bl               ;...swaping pixels
 restore:
-        inc     ecx                     ;j++
+        inc     r11                     ;j++
 
-        ror     r13b, 1
-        cmp     r13b, 0x80
-        jne     not_equal
-        inc     r10                     ;Pix1++
-not_equal:
-        add     r9, r11                ;Pix2 += width
+        ror     r8b, 1
+        adc     r12, 0                  ;Pix1 += cf
+
+        add     rdi, r13                ;Pix2 += width
         jmp     inc_col_loop
 
 end_inc_col_loop:
-        inc     r8d                     ;i++
-        cmp     r8d, esi
+        inc     r10                     ;i++
+        cmp     r10, rsi
         jae     end_row_loop            ;break
         ;if (processed rows > rows) break
 
-        add     r10, r11               ;Pix1 += width
+        add     r12, r13                ;Pix1 += width
 
         ror     al, 1
-        cmp     al, 0x80
-        jne     not_equal2
-        inc     r9                      ;Pix2++
-not_equal2:
-        mov     ecx, r8d                ;j=i
+        adc     rdi, 0                  ;Pix2 += cf
+        mov     r11, r10                ;j=i
 dec_col_loop:
-        test    ecx, ecx
+        test    r11, r11
         jz      end_dec_col_loop        ;break
         ;if all pixels in this row were swaped, break
 
-        mov     r12b, r13b              ;temp = bit1
-        and     r12b, [r10]             ;get Pix1 pix-value
+        mov     r9b, r8b                  ;temp = bit1
 
-        mov     dl, al                  ;temp = bit2
-        and     dl, [r9]                ;get Pix1 pix-value
+        mov     bl, al                  ;temp = bit2
+        and     bl, [rdi]               ;get Pix1 pix-value
 
-        test    r12b, r12b              ;swaping pixels...
-        jz      pix1_zero2
-        or      [r9], al
-        jmp     pix22
-pix1_zero2:
-        mov     r12b, al
-        not     r12b
-        and     [r9], r12b
+        or      [rdi], al
+        and     r9b, [r12]               ;get Pix1 pix-value
+        jnz     pix22
+
+        mov     r9b, al
+        not     r9b
+        and     [rdi], r9b
 pix22:
-        test    dl, dl
-        jz      pix2_zero2
-        or      [r10], r13b
-        jmp     restore2
+        or      [r12], r8b
+        test    bl, bl
+        jnz     restore2
 pix2_zero2:
-        mov     dl, r13b
-        not     dl
-        and     [r10], dl               ;...swaping pixels
+        mov     bl, r8b
+        not     bl
+        and     [r12], bl               ;...swaping pixels
 restore2:
-        dec     ecx                     ;j--
+        dec     r11                     ;j--
 
-        rol     r13b, 1
-        cmp     r13b, 0x01
-        jne     no_dec
-        dec     r10                     ;Pix1--
+        rol     r8b, 1
+        cmp     r8b, 0x01
+        jne     no_dec                                                          ;można zrobić magię i się pozbyć skoku
+        dec     r12                     ;Pix1--
 no_dec:
-        sub     r9, r11                ;Pix2 -= width
+        sub     rdi, r13                ;Pix2 -= width
         jmp     dec_col_loop
 
 end_dec_col_loop:
-        inc     r8d                     ;i++
-        add     r10, r11               ;Pix1 += width
-        ror     r13b, 1
-        cmp     r13b, 0x80
-        jne      no_inc
-        inc     r10                     ;Pix1++
+        inc     r10                     ;i++
+        add     r12, r13                ;Pix1 += width
+        ror     r8b, 1
+        cmp     r8b, 0x80                                                        ;można zrobić magię i się pozbyć skoku
+        jne     no_inc
+        inc     r12                     ;Pix1++
 no_inc:
-        add     r9, r11                ;Pix2 += width
+        add     rdi, r13                ;Pix2 += width
         ror     al, 1
         cmp     al, 0x80
         jne     no_inc2
-        inc     r9                      ;Pix2++
+        inc     rdi                     ;Pix2++
 no_inc2:
-        jmp     two_row_loop
+        cmp     r10, rsi
+        jl      two_row_loop
+        ;if (processed rows > rows) break
 
 end_row_loop:
         ;epilogue
-        push r13
-        push r12
+        pop     rbx
+        pop     r12
+        pop     r13
         ret
 

@@ -14,7 +14,7 @@ flipdiagbmp1:
 
         mov     ebx, [ebp+12]
         add     ebx, 31
-        shr     ebx, 3                  ; zamiast tego czegoś zrobić +31 shr 5
+        shr     ebx, 3
         and     ebx, -4
         ;row lenght with padding in ebx
 
