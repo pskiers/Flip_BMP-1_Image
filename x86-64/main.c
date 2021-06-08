@@ -4,17 +4,15 @@
 
 extern void flipdiagbmp1(void *bitmap, int width);
 
-int main(//int argc, const char *argv[])
-)
+int main(int argc, const char *argv[])
 {
-    // if (argc != 2)
-    // {
-    //     printf("Bad amount of arguments\n");
-    //     return 0;
-    // }
+    if (argc != 2)
+    {
+        printf("Bad amount of arguments\n");
+        return 0;
+    }
     FILE *file_pointer;
-    // file_pointer = fopen(argv[1], "rb");
-    file_pointer = fopen("images/5x5.bmp", "rb");
+    file_pointer = fopen(argv[1], "rb");
     if (file_pointer == NULL)
     {
         printf("Invalid file name\n");
@@ -55,8 +53,7 @@ int main(//int argc, const char *argv[])
     fclose(file_pointer);
     flipdiagbmp1(bitmap, width);
     printf("Image has been filpped\n");
-    // file_pointer = fopen(argv[1], "wb");
-    file_pointer = fopen("images/5x5.bmp", "wb");
+    file_pointer = fopen(argv[1], "wb");
     if (file_pointer == NULL)
     {
         printf("Unable to open the file in write mode\n");

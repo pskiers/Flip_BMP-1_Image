@@ -5,17 +5,17 @@
 flipdiagbmp1:
         push rbx
         push r12
-        push r13
+
         ;end of prologue
 
-        mov     r13, rsi
-        add     r13, 31
-        shr     r13, 3
-        and     r13, -4
-        ;row lenght with padding in r13
+        mov     rcx, rsi
+        add     rcx, 31
+        shr     rcx, 3
+        and     rcx, -4
+        ;row lenght with padding in rcx
 
         mov     r12, rdi
-        add     r12, r13
+        add     r12, rcx
         ;address of pixel to swap from upper left part in r12
         ;address of pixel to swap from lower right part in rdi
 
@@ -59,7 +59,7 @@ restore:
         ror     r8b, 1
         adc     r12, 0                  ;Pix1 += cf
 
-        add     rdi, r13                ;Pix2 += width
+        add     rdi, rcx                ;Pix2 += width
         jmp     inc_col_loop
 
 end_inc_col_loop:
@@ -68,7 +68,7 @@ end_inc_col_loop:
         jae     end_row_loop            ;break
         ;if (processed rows > rows) break
 
-        add     r12, r13                ;Pix1 += width
+        add     r12, rcx                ;Pix1 += width
 
         ror     al, 1
         adc     rdi, 0                  ;Pix2 += cf
@@ -106,18 +106,18 @@ restore2:
         jne     no_dec                                                          ;można zrobić magię i się pozbyć skoku
         dec     r12                     ;Pix1--
 no_dec:
-        sub     rdi, r13                ;Pix2 -= width
+        sub     rdi, rcx                ;Pix2 -= width
         jmp     dec_col_loop
 
 end_dec_col_loop:
         inc     r10                     ;i++
-        add     r12, r13                ;Pix1 += width
+        add     r12, rcx                ;Pix1 += width
         ror     r8b, 1
         cmp     r8b, 0x80                                                        ;można zrobić magię i się pozbyć skoku
         jne     no_inc
         inc     r12                     ;Pix1++
 no_inc:
-        add     rdi, r13                ;Pix2 += width
+        add     rdi, rcx                ;Pix2 += width
         ror     al, 1
         cmp     al, 0x80
         jne     no_inc2
@@ -129,8 +129,7 @@ no_inc2:
 
 end_row_loop:
         ;epilogue
-        pop     rbx
         pop     r12
-        pop     r13
+        pop     rbx
         ret
 
